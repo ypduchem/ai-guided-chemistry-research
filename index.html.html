@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化學研究與 AI 協作實戰指引 | Lab Onboarding & AI Research Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        lab: {
+                            950: '#07111e',
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#0284c7',
+                            500: '#0ea5e9',
+                            400: '#38bdf8',
+                            teal: '#0d9488',
+                            cyan: '#06b6d4',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar & Subtle Grid Background */
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .bg-chem-pattern {
+            background-color: #07111e;
+            background-image: radial-gradient(rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+                              radial-gradient(rgba(20, 184, 166, 0.1) 1px, #07111e 1px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+        }
+        .prompt-pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .stage-tab.active {
+            background: linear-gradient(135deg, #0f172a 0%, #0284c7 100%);
+            color: #ffffff;
+            border-color: #0284c7;
+            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.35);
+        }
+        .stage-tab.active .step-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- Toast Notification for Copy Feedback -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl border border-cyan-500/40 flex items-center gap-3">
+            <div class="w-7 h-7 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div>
+                <p class="text-sm font-bold">已複製提示詞 (Prompt Copied!)</p>
+                <p class="text-xs text-slate-400">可直接貼上至 Gemini / NotebookLM / Claude 使用</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 text-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
+                    <i class="fa-solid fa-atom text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold tracking-tight text-base sm:text-lg text-white block leading-none">AI Guided Chemistry Research</span>
+                    <span class="text-xs text-cyan-400 font-mono">materials' chemistry and Catalysis.</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-1 lg:gap-2 text-sm font-medium">
+                <a href="#core-concepts" class="px-3 py-2 rounded-lg text-amber-300 hover:bg-slate-800/80 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-compass text-xs"></i> 基本概念
+                </a>
+                <a href="#workflow-section" class="px-3 py-2 rounded-lg text-slate-200 hover:text-cyan-400 hover:bg-slate-800/80 transition">
+                    6 大研究階段
+                </a>
+                <a href="#student-share-section" class="px-3 py-2 rounded-lg text-teal-300 hover:text-teal-200 hover:bg-slate-800/80 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-share-nodes text-xs"></i> 同學分享區
+                </a>
+                <a href="#prompt-library" class="ml-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-semibold shadow-md shadow-cyan-900/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-terminal text-xs"></i> Prompt 提示詞總庫
+                </a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 focus:outline-none" aria-label="開啟選單">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+            <a href="#core-concepts" class="block px-3 py-2.5 rounded-lg text-amber-300 font-medium hover:bg-slate-800">
+                <i class="fa-solid fa-compass mr-2"></i> 基本概念 & AI 研究流程圖
+            </a>
+            <a href="#workflow-section" class="block px-3 py-2.5 rounded-lg text-slate-200 font-medium hover:bg-slate-800">
+                <i class="fa-solid fa-layer-group mr-2 text-cyan-400"></i> 6 大化學研究階段指引
+            </a>
+            <a href="#student-share-section" class="block px-3 py-2.5 rounded-lg text-teal-300 font-medium hover:bg-slate-800">
+                <i class="fa-solid fa-share-nodes mr-2"></i> 同學 Prompt 分享專區
+            </a>
+            <a href="#prompt-library" class="block px-3 py-2.5 rounded-lg bg-cyan-600/20 text-cyan-300 font-semibold border border-cyan-500/30">
+                <i class="fa-solid fa-terminal mr-2"></i> Prompt 提示詞總庫
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="bg-chem-pattern text-white py-14 sm:py-20 border-b border-slate-800 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm font-medium mb-6">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    研究生 Onboarding 數位手冊 · AI-Assisted Chemistry Research
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-6">
+                    從文獻探索到碩士論文：<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-sky-400">
+                        化學研究與 AI 協作實戰指引
+                    </span>
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-8">
+                    本指引專為本實驗室新進碩士生打造， <strong> 使你了解科學研究的工作流程與AI使用技巧 </strong>。協助你進行嚴謹、高效且零幻覺的研究工作。
+                </p>
+
+                
+                    </span>
+                </div>
+
+                <div class="flex flex-wrap gap-4">
+                    <a href="#workflow-section" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-400 hover:to-teal-500 text-white font-bold shadow-lg shadow-cyan-500/25 transition flex items-center gap-2">
+                        開始 6 大研究階段 <i class="fa-solid fa-arrow-down"></i>
+                    </a>
+                    <a href="#prompt-library" class="px-6 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-100 font-semibold border border-slate-600 transition flex items-center gap-2">
+                        <i class="fa-solid fa-copy text-cyan-400"></i> 前往 Prompt 提示詞總庫
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+        <!-- TOP SECTION: Core Concepts & AI-Powered Chemistry Research Workflow -->
+        <section id="core-concepts" class="scroll-mt-20">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-8">
+                <!-- Section Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-600 text-white flex items-center justify-center shadow-md shadow-cyan-600/20 shrink-0">
+                            <i class="fa-solid fa-compass text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-cyan-800 bg-cyan-100 px-2.5 py-0.5 rounded-md">Core Concepts & Research Cycle</span>
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">基本概念 (Fundamental Concepts)</h2>
+                        </div>
+                    </div>
+                    <span class="text-xs sm:text-sm font-medium text-amber-900 bg-amber-50 px-3.5 py-2 rounded-xl border border-amber-300 self-start sm:self-center">
+                        <i class="fa-solid fa-shield-halved text-amber-600 mr-1.5"></i>進實驗室與寫論文前必讀準則
+                    </span>
+                </div>
+
+                <!-- Part 1: AI-Powered Chemistry Research Workflow Diagram (Custom Vector Infographic) -->
+                <div class="bg-[#fcfbf9] border border-slate-200/90 rounded-2xl p-6 sm:p-10 shadow-inner relative overflow-hidden">
+                    <!-- Title & AI Circuit Divider (Matching Reference Style) -->
+                    <div class="text-center max-w-2xl mx-auto mb-10">
+                        <h3 class="text-2xl sm:text-4xl font-black tracking-tight text-slate-900">
+                            AI-Powered Research Workflow
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                            化學與催化研究之 AI 協作與實驗迭代循環（點擊任一階段圓圈可跳轉至對應章節）
+                        </p>
+
+                        <!-- Stylized AI Microchip Divider -->
+                        <div class="flex items-center justify-center mt-4">
+                            <div class="w-24 sm:w-44 h-[1.5px] bg-slate-800 relative">
+                                <span class="w-2 h-2 rounded-full bg-slate-900 absolute -left-1 -top-[3px]"></span>
+                            </div>
+                            <div class="mx-2 flex items-center">
+                                <!-- Left circuit lines -->
+                                <svg class="w-6 h-6 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M24 8H14L10 4H4" />
+                                    <circle cx="3" cy="4" r="1.5" fill="currentColor" />
+                                    <path d="M24 12H8" />
+                                    <circle cx="6" cy="12" r="1.5" fill="currentColor" />
+                                    <path d="M24 16H14L10 20H4" />
+                                    <circle cx="3" cy="20" r="1.5" fill="currentColor" />
+                                </svg>
+                                <span class="px-2.5 py-1 rounded-md bg-slate-900 text-white font-mono font-black text-xs tracking-wider shadow-sm">
+                                    AI
+                                </span>
+                                <!-- Right circuit lines -->
+                                <svg class="w-6 h-6 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M0 8H10L14 4H20" />
+                                    <circle cx="21" cy="4" r="1.5" fill="currentColor" />
+                                    <path d="M0 12H16" />
+                                    <circle cx="18" cy="12" r="1.5" fill="currentColor" />
+                                    <path d="M0 16H10L14 20H20" />
+                                    <circle cx="21" cy="20" r="1.5" fill="currentColor" />
+                                </svg>
+                            </div>
+                            <div class="w-24 sm:w-44 h-[1.5px] bg-slate-800 relative">
+                                <span class="w-2 h-2 rounded-full bg-slate-900 absolute -right-1 -top-[3px]"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5-Stage Circular Workflow Nodes -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-3 relative z-10 items-start">
+
+                        <!-- NODE 1: Idea Generation & Literature Review -->
+                        <div onclick="jumpToStage(1)" class="group cursor-pointer flex flex-col items-center text-center relative">
+                            <!-- Forward Arrow (Desktop) -->
+                            <div class="hidden md:flex absolute -right-4 top-[72px] z-20 text-slate-800 items-center">
+                                <svg class="w-7 h-7 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="13 6 19 12 13 18"></polyline>
+                                </svg>
+                            </div>
+
+                            <!-- Circle Container -->
+                            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
+                                <!-- Outer Decorative Arc -->
+                                <svg class="absolute inset-0 w-full h-full -rotate-12 group-hover:rotate-6 transition-transform duration-500" viewBox="0 0 160 160">
+                                    <circle cx="80" cy="80" r="74" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="110 70" />
+                                    <circle cx="80" cy="80" r="66" fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+                                    <circle cx="80" cy="80" r="59" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" />
+                                </svg>
+                                <!-- Number Badge -->
+                                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-slate-900 group-hover:bg-cyan-600 text-white font-bold text-sm flex items-center justify-center shadow-md transition-colors z-10">
+                                    1
+                                </div>
+                                <!-- Custom SVG Icon: Open Book + Glowing Lightbulb -->
+                                <svg class="w-16 h-16 relative z-10 text-slate-900 group-hover:scale-105 transition-transform" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Lightbulb glow rays -->
+                                    <line x1="32" y1="6" x2="32" y2="9" />
+                                    <line x1="20" y1="11" x2="22" y2="13" />
+                                    <line x1="44" y1="11" x2="42" y2="13" />
+                                    <line x1="16" y1="21" x2="19" y2="21" />
+                                    <line x1="48" y1="21" x2="45" y2="21" />
+                                    <!-- Bulb -->
+                                    <path d="M25 21a7 7 0 1 1 14 0c0 3-2 5-3 7h-8c-1-2-3-4-3-7z" fill="#fef3c7" stroke="#0f172a" />
+                                    <rect x="28" y="28" width="8" height="4" rx="1" fill="#e2e8f0" />
+                                    <!-- Connection bracket to book -->
+                                    <path d="M32 32v6" />
+                                    <!-- Open Book -->
+                                    <path d="M12 40c6-2 14-2 20 1 6-3 14-3 20-1v14c-6-2-14-2-20 1-6-3-14-3-20-1V40z" fill="#f1f5f9" />
+                                    <path d="M32 41v14" />
+                                    <path d="M16 45h11M16 49h11M37 45h11M37 49h11" stroke-width="1.5" stroke="#475569" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-cyan-700 transition-colors">
+                                文獻回顧與發想<br>
+                                <span class="text-xs font-semibold text-slate-600">Idea Generation & Literature</span>
+                            </h4>
+                            <div class="w-20 h-[1px] bg-slate-300 my-2.5 relative">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-700 absolute left-1/2 -translate-x-1/2 -top-[2.5px]"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                                AI 協助探索最新文獻趨勢、綜整大量研究，並透過壓力測試發掘具機制突破性的研究缺口。
+                            </p>
+                            <span class="mt-2 text-[11px] font-mono font-semibold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200 opacity-90 group-hover:opacity-100">
+                                對應 Ch.1 & Ch.2 →
+                            </span>
+                        </div>
+
+                        <!-- NODE 2: Experimental Design (Inserted between 1 and 2, Part of Iterative Loop) -->
+                        <div onclick="jumpToStage(3)" class="group cursor-pointer flex flex-col items-center text-center relative">
+                            <!-- Forward Arrow (Desktop) -->
+                            <div class="hidden md:flex absolute -right-4 top-[72px] z-20 text-slate-800 items-center">
+                                <svg class="w-7 h-7 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="13 6 19 12 13 18"></polyline>
+                                </svg>
+                            </div>
+
+                            <!-- Circle Container (Highlighted as Loop Anchor) -->
+                            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
+                                <svg class="absolute inset-0 w-full h-full rotate-12 group-hover:-rotate-6 transition-transform duration-500" viewBox="0 0 160 160">
+                                    <circle cx="80" cy="80" r="74" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="95 65" />
+                                    <circle cx="80" cy="80" r="66" fill="#ffffff" stroke="#0f172a" stroke-width="2.2" />
+                                    <circle cx="80" cy="80" r="59" fill="none" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="3 3" />
+                                </svg>
+                                <!-- Number Badge -->
+                                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-sky-700 group-hover:bg-sky-600 text-white font-bold text-sm flex items-center justify-center shadow-md transition-colors z-10">
+                                    2
+                                </div>
+                                <!-- Custom SVG Icon: Experimental Design Blueprint, Ligand Complex & EPR Wave -->
+                                <svg class="w-16 h-16 relative z-10 text-slate-900 group-hover:scale-105 transition-transform" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Clipboard / Matrix Board -->
+                                    <rect x="14" y="12" width="36" height="42" rx="3" fill="#f0f9ff" stroke="#0f172a" />
+                                    <path d="M24 10h16v5H24z" fill="#bae6fd" stroke="#0f172a" />
+                                    <!-- Coordination complex / Hexagon ring inside -->
+                                    <polygon points="27,22 33,22 36,27 33,32 27,32 24,27" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8" />
+                                    <circle cx="30" cy="27" r="2" fill="#0f172a" />
+                                    <!-- Parameter sliders -->
+                                    <line x1="20" y1="38" x2="44" y2="38" stroke-width="1.8" />
+                                    <circle cx="28" cy="38" r="2.5" fill="#0284c7" />
+                                    <!-- EPR Derivative Spectrum Wave at bottom -->
+                                    <path d="M19 46h6l3-5 4 10 3-5h9" stroke="#0d9488" stroke-width="2" fill="none" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-sky-700 transition-colors">
+                                實驗設計與光譜規劃<br>
+                                <span class="text-xs font-semibold text-sky-800">Experimental Design</span>
+                            </h4>
+                            <div class="w-20 h-[1px] bg-sky-300 my-2.5 relative">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-700 absolute left-1/2 -translate-x-1/2 -top-[2.5px]"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                                AI 協助規劃控制變數、溶劑與反應條件，並回顧文獻推薦適合的光譜或其他分析工具。
+                            </p>
+                            <span class="mt-2 text-[11px] font-mono font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                                對應 Ch.3 →
+                            </span>
+                        </div>
+
+                        <!-- NODE 3: Chemistry Benchwork & Data Collection (Cyclic with Node 4) -->
+                        <div onclick="jumpToStage(3)" class="group cursor-pointer flex flex-col items-center text-center relative">
+                            <!-- Forward Arrow (Desktop) -->
+                            <div class="hidden md:flex absolute -right-4 top-[72px] z-20 text-slate-800 items-center">
+                                <svg class="w-7 h-7 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="13 6 19 12 13 18"></polyline>
+                                </svg>
+                            </div>
+
+                            <!-- Circle Container -->
+                            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
+                                <svg class="absolute inset-0 w-full h-full -rotate-6 group-hover:rotate-12 transition-transform duration-500" viewBox="0 0 160 160">
+                                    <circle cx="80" cy="80" r="74" fill="none" stroke="#0d9488" stroke-width="2" stroke-dasharray="100 60" />
+                                    <circle cx="80" cy="80" r="66" fill="#ffffff" stroke="#0f172a" stroke-width="2.2" />
+                                    <circle cx="80" cy="80" r="59" fill="none" stroke="#0d9488" stroke-width="1.2" stroke-dasharray="3 3" />
+                                </svg>
+                                <!-- Number Badge -->
+                                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-teal-700 group-hover:bg-teal-600 text-white font-bold text-sm flex items-center justify-center shadow-md transition-colors z-10">
+                                    3
+                                </div>
+                                <!-- Custom SVG Icon: Chemistry Benchwork Flask, Stirrer & Reaction Bubbles -->
+                                <svg class="w-16 h-16 relative z-10 text-slate-900 group-hover:scale-105 transition-transform" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Flask Neck & Rim -->
+                                    <path d="M26 10h12" stroke-width="2.5" />
+                                    <path d="M28 10v10l-12 20a5 5 0 0 0 4.3 7.5h23.4A5 5 0 0 0 48 40L36 20V10" fill="#f0fdfa" stroke="#0f172a" />
+                                    <!-- Liquid level inside flask -->
+                                    <path d="M20.5 33c4-2 8 2 11.5 0s7.5-2 11.5 0l4.2 7a4.8 4.8 0 0 1-4.1 7.3H20.4a4.8 4.8 0 0 1-4.1-7.3l4.2-7z" fill="#99f6e4" stroke="none" />
+                                    <path d="M20.5 33c4-2 8 2 11.5 0s7.5-2 11.5 0" stroke="#0d9488" stroke-width="1.8" />
+                                    <!-- Reaction Bubbles & Stir bar -->
+                                    <circle cx="29" cy="39" r="1.8" fill="#0f172a" />
+                                    <circle cx="35" cy="36" r="1.5" fill="#0f172a" />
+                                    <circle cx="32" cy="27" r="1.5" fill="#0d9488" />
+                                    <line x1="27" y1="43.5" x2="37" y2="43.5" stroke="#0f172a" stroke-width="2.5" />
+                                    <!-- Hotplate Stirrer Base -->
+                                    <rect x="14" y="51" width="36" height="5" rx="1.5" fill="#cbd5e1" stroke="#0f172a" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-teal-700 transition-colors">
+                                實驗執行與數據收集<br>
+                                <span class="text-xs font-semibold text-teal-800">Benchwork & Data Collection</span>
+                            </h4>
+                            <div class="w-20 h-[1px] bg-teal-300 my-2.5 relative">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-700 absolute left-1/2 -translate-x-1/2 -top-[2.5px]"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                                進入實驗室執行催化劑合成、反應測試與光譜數據收集，詳實記錄各種實驗現象。
+                            </p>
+                            <span class="mt-2 text-[11px] font-mono font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                對應 Ch.3 Benchwork →
+                            </span>
+                        </div>
+
+                        <!-- NODE 4: Data Analysis & Interpretation -->
+                        <div onclick="jumpToStage(4)" class="group cursor-pointer flex flex-col items-center text-center relative">
+                            <!-- Forward Arrow (Desktop) -->
+                            <div class="hidden md:flex absolute -right-4 top-[72px] z-20 text-slate-800 items-center">
+                                <svg class="w-7 h-7 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="13 6 19 12 13 18"></polyline>
+                                </svg>
+                            </div>
+
+                            <!-- Circle Container -->
+                            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
+                                <svg class="absolute inset-0 w-full h-full rotate-6 group-hover:-rotate-12 transition-transform duration-500" viewBox="0 0 160 160">
+                                    <circle cx="80" cy="80" r="74" fill="none" stroke="#4f46e5" stroke-width="2" stroke-dasharray="100 60" />
+                                    <circle cx="80" cy="80" r="66" fill="#ffffff" stroke="#0f172a" stroke-width="2.2" />
+                                    <circle cx="80" cy="80" r="59" fill="none" stroke="#4f46e5" stroke-width="1.2" stroke-dasharray="3 3" />
+                                </svg>
+                                <!-- Number Badge -->
+                                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-indigo-700 group-hover:bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shadow-md transition-colors z-10">
+                                    4
+                                </div>
+                                <!-- Custom SVG Icon: Magnifying Glass Inspecting Spectra & Atomic Network -->
+                                <svg class="w-16 h-16 relative z-10 text-slate-900 group-hover:scale-105 transition-transform" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Magnifying Glass Circle -->
+                                    <circle cx="28" cy="28" r="16" fill="#eef2ff" stroke="#0f172a" stroke-width="2.2" />
+                                    <!-- Handle -->
+                                    <line x1="40" y1="40" x2="52" y2="52" stroke="#0f172a" stroke-width="4" stroke-linecap="round" />
+                                    <!-- Spectral Peak & Nodes inside lens -->
+                                    <path d="M16 33h5l4-12 5 15 3-7h5" stroke="#4f46e5" stroke-width="2" fill="none" />
+                                    <circle cx="25" cy="21" r="2" fill="#0d9488" stroke="none" />
+                                    <circle cx="30" cy="36" r="2" fill="#4f46e5" stroke="none" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-indigo-700 transition-colors">
+                                數據解析與假說推演<br>
+                                <span class="text-xs font-semibold text-indigo-800">Analysis & Interpretation</span>
+                            </h4>
+                            <div class="w-20 h-[1px] bg-indigo-300 my-2.5 relative">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-700 absolute left-1/2 -translate-x-1/2 -top-[2.5px]"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                                AI 協助診斷異常光譜偏移與活性趨勢、提出物理化學假說，並回頭設計新實驗條件驗證。
+                            </p>
+                            <span class="mt-2 text-[11px] font-mono font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                對應 Ch.4 →
+                            </span>
+                        </div>
+
+                        <!-- NODE 5: Writing & Thesis Self-Review -->
+                        <div onclick="jumpToStage(5)" class="group cursor-pointer flex flex-col items-center text-center relative">
+                            <!-- Circle Container -->
+                            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
+                                <svg class="absolute inset-0 w-full h-full -rotate-12 group-hover:rotate-6 transition-transform duration-500" viewBox="0 0 160 160">
+                                    <circle cx="80" cy="80" r="74" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="110 70" />
+                                    <circle cx="80" cy="80" r="66" fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+                                    <circle cx="80" cy="80" r="59" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" />
+                                </svg>
+                                <!-- Number Badge -->
+                                <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-slate-900 group-hover:bg-emerald-600 text-white font-bold text-sm flex items-center justify-center shadow-md transition-colors z-10">
+                                    5
+                                </div>
+                                <!-- Custom SVG Icon: Manuscript Document & Fountain Pen -->
+                                <svg class="w-16 h-16 relative z-10 text-slate-900 group-hover:scale-105 transition-transform" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Document Page -->
+                                    <path d="M16 12h22l8 8v32a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V14a2 2 0 0 1 2-2z" fill="#f8fafc" />
+                                    <path d="M38 12v8h8" fill="#e2e8f0" />
+                                    <!-- Text lines & signature wave -->
+                                    <line x1="20" y1="24" x2="36" y2="24" />
+                                    <line x1="20" y1="30" x2="40" y2="30" />
+                                    <line x1="20" y1="36" x2="34" y2="36" />
+                                    <path d="M20 45c2-2 4 2 6 0s4-2 6 0" stroke="#0d9488" stroke-width="1.8" />
+                                    <!-- Pen -->
+                                    <path d="M48 22l4 4-16 16-5 1 1-5 16-16z" fill="#fde68a" stroke="#0f172a" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-emerald-700 transition-colors">
+                                論文撰寫與自我預審<br>
+                                <span class="text-xs font-semibold text-slate-600">Writing & Thesis Review</span>
+                            </h4>
+                            <div class="w-20 h-[1px] bg-slate-300 my-2.5 relative">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-700 absolute left-1/2 -translate-x-1/2 -top-[2.5px]"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                                AI 輔助數據視覺化構思、圖表故事線編排，以及碩士論文交稿前的預審口委自我健檢。
+                            </p>
+                            <span class="mt-2 text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                對應 Ch.5 & Ch.6 →
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <!-- Iterative Feedback Loop Return Track (Connecting Stage 4 -> Stage 3 & Stage 2) -->
+                    <div class="mt-8 pt-2 relative">
+                        <!-- Desktop SVG Loop Connector spanning specifically under Stages 2, 3, and 4 -->
+                        <div class="hidden md:grid grid-cols-5 items-center">
+                            <!-- Col 1 spacer -->
+                            <div></div>
+                            <!-- Cols 2, 3, 4: The Iterative Experimentation Loop Track -->
+                            <div class="col-span-3 relative px-6">
+                                <!-- U-shaped Return Arrow from Col 4 back to Col 2 & Col 3 -->
+                                <div class="border-b-[2.5px] border-l-[2.5px] border-r-[2.5px] border-slate-800 rounded-b-2xl h-12 relative flex items-center justify-center">
+                                    <!-- Upward Arrowhead pointing to Stage 2 (Experimental Design) -->
+                                    <div class="absolute -left-[9px] -top-2 text-slate-900">
+                                        <i class="fa-solid fa-caret-up text-xl"></i>
+                                    </div>
+                                    <!-- Upward Branch Arrowhead pointing to Stage 3 (Benchwork & Data Collection) -->
+                                    <div class="absolute left-1/2 -translate-x-1/2 -top-3 flex flex-col items-center">
+                                        <i class="fa-solid fa-caret-up text-lg text-teal-700"></i>
+                                    </div>
+                                    <!-- Origin dot under Stage 4 (Analysis & Interpretation) -->
+                                    <div class="absolute -right-[6px] -top-1.5 w-3 h-3 rounded-full bg-indigo-700 border-2 border-white shadow"></div>
+
+                                    <!-- Center Loop Box (Matching Reference Image Bottom Box Style) -->
+                                    <div class="translate-y-5 bg-white border-2 border-slate-900 rounded-xl px-4 py-2.5 shadow-md flex items-center gap-3.5 max-w-md">
+                                        <div class="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                                            <i class="fa-solid fa-arrows-rotate text-lg animate-spin" style="animation-duration: 10s;"></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                                                驗證新猜想之實驗循環 (Iterative Hypothesis Loop)
+                                            </div>
+                                            <p class="text-[11px] text-slate-600 leading-snug mt-0.5">
+                                                <strong>4. 數據解釋</strong>發現異常與新機制假說 → 回頭重新進行 <strong>2. 實驗設計</strong> 與 <strong>3. 數據收集</strong> 驗證猜想
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Col 5 spacer -->
+                            <div></div>
+                        </div>
+
+                        <!-- Mobile Fallback for Iterative Loop Box -->
+                        <div class="md:hidden mt-2 bg-white border-2 border-slate-900 rounded-xl p-4 shadow-sm flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-arrows-rotate text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs font-black text-slate-900">
+                                    階段 2 ↔ 3 ↔ 4：驗證新猜想之實驗循環
+                                </div>
+                                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                                    <strong>數據收集 (3)</strong> 與 <strong>數據解釋 (4)</strong> 形成緊密循環；解釋數據後產生新假說，需回頭進行 <strong>新實驗設計 (2)</strong> 以驗證猜想，完備後再進入 <strong>論文撰寫 (5)</strong>。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2: Two Foundational Rules (Anti-Hallucination & Lab Safety) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                    <!-- Rule 1: Anti-Hallucination -->
+                    <div class="bg-gradient-to-br from-rose-50/70 to-amber-50/40 rounded-xl p-5 sm:p-6 border border-rose-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2.5 text-rose-700 font-bold text-lg mb-3">
+                                <i class="fa-solid fa-file-shield"></i>
+                                <span>核心原則 1：防幻覺原則 (Anti-Hallucination)</span>
+                            </div>
+                            <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-4">
+                                AI 產出的<strong>文獻 DOI、熱力學數據、光譜峰位歸屬（Peak assignment）或合成步驟</strong>，務必親自到原始出處進行二次確認。<strong>請勿在報告或碩士論文中直接引用未親自查證過的文獻！</strong>
+                            </p>
+                        </div>
+                        <div class="bg-white/90 border border-rose-200/80 rounded-lg p-3.5 text-xs sm:text-sm text-rose-900 flex items-start gap-2.5">
+                            <i class="fa-solid fa-database mt-0.5 text-rose-600"></i>
+                            <span><strong>必備查核資料庫：</strong> SciFinder、Google Scholar 與期刊原始 Supporting Information。</span>
+                        </div>
+                    </div>
+
+                    <!-- Rule 2: Lab Safety First -->
+                    <div class="bg-gradient-to-br from-amber-50/80 to-orange-50/50 rounded-xl p-5 sm:p-6 border border-amber-200/90 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2.5 text-amber-800 font-bold text-lg mb-3">
+                                <i class="fa-solid fa-helmet-safety"></i>
+                                <span>核心原則 2：實驗安全底線 (Lab Safety First)</span>
+                            </div>
+                            <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-4">
+                                AI 不具備真實實驗室的物理風險感知。任何 AI 建議的反應條件（特別涉及<strong>高壓氣體如 H<sub>2</sub>/CO/CO<sub>2</sub>、強酸鹼、有機溶劑密閉加熱/水熱釜、高溫管狀爐鍛燒、或連續流反應系統操作</strong>），進入實驗室（Benchwork）前<strong>必須查閱 SDS 並經過學長姐或指導教授審核 SOP</strong>。
+                            </p>
+                        </div>
+                        <div class="bg-white/90 border border-amber-300/80 rounded-lg p-3.5 text-xs sm:text-sm text-amber-950 flex items-start gap-2.5">
+                            <i class="fa-solid fa-user-check mt-0.5 text-amber-700"></i>
+                            <span><strong>安全鐵律：</strong>使用新的試劑，請務必搜尋藥品的風險，高壓與高溫反應需特別注意安全性，測試超過三次後若有需要才可以進行過夜實驗。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: 6 Major Research Stages Interactive Navigator -->
+        <section id="workflow-section" class="scroll-mt-20 space-y-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-700 bg-cyan-100 px-3 py-1 rounded-full">Step-by-Step Workflow</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">六大化學研究階段與 AI 協作實戰</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-1">點擊下方任一研究階段，查看對應的「AI 協作流程」、「本實驗室研究情境」與「專屬可複製提示詞」。</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="expand-all-stages-btn" onclick="toggleAllStagesView()" class="text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 transition flex items-center gap-2">
+                        <i class="fa-solid fa-table-list"></i> <span id="expand-btn-text">展開全部 6 章節同頁瀏覽</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stage Selector Tabs (Grid of 6 Buttons) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="stage-tabs-container">
+                <button onclick="selectStage(1)" id="tab-btn-1" class="stage-tab active text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 01</span>
+                        <i class="fa-solid fa-book-atlas text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">文獻搜尋與知識庫</div>
+                    <div class="text-xs opacity-75 mt-1">Deep Research & NotebookLM</div>
+                </button>
+
+                <button onclick="selectStage(2)" id="tab-btn-2" class="stage-tab text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 02</span>
+                        <i class="fa-solid fa-lightbulb text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">發想方向與機制突破</div>
+                    <div class="text-xs opacity-75 mt-1">科學思辨與壓力測試</div>
+                </button>
+
+                <button onclick="selectStage(3)" id="tab-btn-3" class="stage-tab text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 03</span>
+                        <i class="fa-solid fa-flask-vial text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">實驗設計與光譜規劃</div>
+                    <div class="text-xs opacity-75 mt-1">活性點設計/合成過程/表面化學探究</div>
+                </button>
+
+                <button onclick="selectStage(4)" id="tab-btn-4" class="stage-tab text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 04</span>
+                        <i class="fa-solid fa-chart-line text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">數據解析與異常診斷</div>
+                    <div class="text-xs opacity-75 mt-1">挖掘新發現與新實驗條件</div>
+                </button>
+
+                <button onclick="selectStage(5)" id="tab-btn-5" class="stage-tab text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 05</span>
+                        <i class="fa-solid fa-pen-ruler text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">寫作與數據視覺化</div>
+                    <div class="text-xs opacity-75 mt-1">圖表邏輯鏈與學術潤飾</div>
+                </button>
+
+                <button onclick="selectStage(6)" id="tab-btn-6" class="stage-tab text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-cyan-500 transition flex flex-col justify-between group">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <span class="step-badge text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">STAGE 06</span>
+                        <i class="fa-solid fa-graduation-cap text-base opacity-80"></i>
+                    </div>
+                    <div class="font-bold text-sm sm:text-base leading-snug">碩士論文自我健檢</div>
+                    <div class="text-xs opacity-75 mt-1">預審口委與交稿前查核</div>
+                </button>
+            </div>
+
+            <!-- STAGE PANELS CONTAINER -->
+            <div id="stages-content-wrapper" class="space-y-10">
+
+                <!-- ==================== CHAPTER 1 ==================== -->
+                <article id="stage-panel-1" class="stage-panel bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-cyan-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 01</span>
+                            <span>•</span>
+                            <span>Literature Review & Deep Research</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">1. 文獻搜尋到整理：打造專屬知識庫 (整合 Deep Research 到 NotebookLM)</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            擺脫「下載了一堆 PDF 卻看不完」的困境，結合 AI 深度搜索與零幻覺知識庫，快速掌握材料性質、生質物轉化或 CO<sub>2</sub> 氫化反應的文獻脈絡。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <!-- 3 Core Subsections -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">1.1</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">傳統檢索與 Deep Research 深度探索</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">核心資料庫設定：</strong>精準組合關鍵字於 SciFinder 與 Google Scholar 搜尋。</li>
+                                    <li><strong class="text-cyan-800 bg-cyan-100/80 px-1 rounded">善用 AI Deep Research 工具：</strong>切入陌生課題（如二氧化碳或生物質衍生平台分子轉化路徑、材料介面的化學、表面修飾、）時，先用具備 <strong>Deep Research</strong> 功能的 AI 進行廣度與深度兼具的領域掃描，生成包含真實文獻來源的調查報告，藉此抓出核心關鍵字與代表性研究團隊。</li>
+                                    
+                             </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-teal-600 text-white font-bold flex items-center justify-center mb-3">1.2</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">建立專屬知識庫（整合 NotebookLM / Gemini）</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">精選高品質文獻源：</strong>從 Deep Research 與傳統資料庫中，挑選 <strong>10–20 篇高關聯度核心文獻（2–3 篇高引用數之 Review + 近期代表性研究論文）</strong>匯入 Google NotebookLM，確保知識來源基於真實 PDF，減少AI記憶幻覺。</li>
+                                    <li><strong class="text-teal-800 bg-teal-100/80 px-1 rounded">跨文獻綜整技巧：</strong>利用提示詞請 AI 自動建立跨文獻比較表格（例如：不同文獻之配位環境/配基設計、金屬氧化物表面修飾方式、反應溫度/壓力、轉化率與選擇性對照表）。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center mb-3">1.3</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">抓出領域共識與爭議點</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">表面機制與構效關係：</strong>利用 NotebookLM 快速摘要出目前學界對特定表面化學機制、結構—活性關係（Structure–Activity Relationship, SAR）的主流解釋。</li>
+                                    <li><strong class="text-slate-900">鎖定未解爭議：</strong>找出不同研究團隊對「真正活性位點（Active sites）」或「關鍵中間體」以及「活性點合成設計」的看法分歧處，這往往就是我們切入新研究的最佳突破口。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Lab Scenario Examples -->
+                        <div class="bg-cyan-50/60 border border-cyan-200 rounded-xl p-5">
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-cyan-900 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-vials text-cyan-600"></i> 本實驗室四大課題檢索與整理範例
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs sm:text-sm">
+                                <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
+                                    <span class="font-bold text-cyan-800 block mb-1">配位化合物與表面作用</span>
+                                    整理金屬中心種類、配基的穩定性、接枝於載體前後的配位數變化與穩定性。
+                                </div>
+                                <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
+                                    <span class="font-bold text-teal-800 block mb-1">金屬氧化物表面化學</span>
+                                    對比不同晶面暴露（Facet engineering）、表面氧空缺濃度（O<sub>v</sub>）如何影響雙元金屬氧化物(binary metal oxide)或與表面缺陷作用的可能性。
+                                </div>
+                                <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
+                                    <span class="font-bold text-emerald-800 block mb-1">生質物轉化 (Biomass)</span>
+                                    彙整單糖異構化、Retro-aldol condensation斷鍵與加氫三種途徑形成的可能產物，了解觸媒系統對轉化率與目標產物選擇性的影響。
+                                </div>
+                                <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
+                                    <span class="font-bold text-sky-800 block mb-1">CO<sub>2</sub> 與小分子活化</span>
+                                    比較金屬—載體強交互作用（SMSI）、表面吸附態中間體（Formate vs. Carboxylate 路徑）與反應溫度。
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 1A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30">Prompt 1A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">跨文獻系統性表格綜整與爭議點分析（適用於 NotebookLM / Gemini）</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-1a')" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-1a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">請根據我上傳於知識庫中的所有文獻，針對「[填入研究主題：如特定配位化合物固載於金屬氧化物表面 / 生物質衍生糖選擇性轉化/金屬-金屬氧化物活性位點」進行跨文獻系統性綜整，並執行以下三項任務：
+
+1. **建立跨文獻結構與活性比較表（Markdown Table）**：
+   請為每一篇文獻整理出以下欄位（若文獻未提及請標註 N/A，切勿自行推測）：
+   - 文獻作者與發表年份
+   - 核心材料系統（如:金屬種類、配基結構 Ligand、或金屬氧化物載體與晶面/缺陷特性）
+   - 合成或表面修飾方法（如含浸法、水熱法、表面接枝等）
+   - 關鍵反應條件（反應物、溶劑、溫度、壓力、氣體氣氛、反應時間或流速）
+   - 催化表現（轉化率 Conversion、目標產物選擇性 Selectivity、TOF 或穩定性測試時數）
+   - 關鍵光譜鑑定證據（文獻用了哪些方法如 XPS, EPR, DRIFTS, XAS ,Chemisorption, TPR, TPD, DR-UV, solid-state NMR或in situ技術來證明其活性位點）
+
+2. **歸納領域主流共識（Consensus）**：
+   綜合這些文獻，目前學界對於影響此反應活性或選擇性的「最關鍵結構因子（Structure–Activity Relationship）」有哪些共同結論？
+
+3. **抓出文獻間的爭議點與研究缺口（Controversies & Gaps）**：
+   有哪些文獻對反應機制、表面吸附構型、或真正活性位點的解釋出現分歧或矛盾？目前還有哪些合成或操作上的瓶頸尚未被解決？（請在每個論點後方標註對應的文獻來源）</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ==================== CHAPTER 2 ==================== -->
+                <article id="stage-panel-2" class="stage-panel hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-teal-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 02</span>
+                            <span>•</span>
+                            <span>Ideation & Mechanistic Breakthroughs</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">2. 發想新研究方向：與 AI 進行科學思辨與機制突破</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            從「讀懂文獻」跨越到「提出有價值的科學問題（Research Gap）」。把 AI 當作嚴格的審稿人進行壓力測試，尋求機制上的突破而非單純換材料的微幅改良。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-teal-600 text-white font-bold flex items-center justify-center mb-3">2.1</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">尋找 Research Gap 的多維度切入點</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed mb-3">
+                                    採用<strong>矩陣式交叉發想</strong>來構思新課題：
+                                </p>
+                                <div class="text-xs sm:text-sm bg-white p-3.5 rounded-lg border border-slate-200 space-y-1.5 text-slate-800">
+                                    <div><i class="fa-solid fa-xmark text-teal-600 mr-1.5"></i><strong>維度 A：</strong>配位環境、不同酸鹼度環境的穩定性</div>
+                                    <div><i class="fa-solid fa-xmark text-teal-600 mr-1.5"></i><strong>維度 B：</strong>金屬氧化物表面化學（氧空缺、酸鹼位點、金屬—載體交互作用 MSI）</div>
+                                    <div><i class="fa-solid fa-xmark text-teal-600 mr-1.5"></i><strong>維度 C：</strong>目標催化反應（生質物特定 C–O/C–C 選擇性斷鍵、小分子吸附活化）</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">2.2</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">壓力測試與尋求「機制上的突破」</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-rose-700">拒絕漸進式改良（Incremental Work）：</strong>不要只問 AI「這個想法好不好」（AI 通常會盲目稱讚），而是要求它扮演<strong>嚴格的審稿人</strong>。</li>
+                                    <li><strong class="text-slate-900">壓力測試法：</strong>請 AI 從「熱力學限制、動力學能障、表面電子結構、反應物吸附性質、活性點工作環境的狀態」進行壓力測試，思考最關鍵的決定性實驗證據（Smoking-gun evidence）。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 2A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-teal-500/20 text-teal-300 font-mono text-xs font-bold border border-teal-500/30">Prompt 2A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">聚焦「機制突破」的研究點子壓力測試提示詞</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-2a')" class="px-3.5 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-2a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我目前計畫研究 [填入材料系統：如某特定配位化合物 / 表面修飾之金屬氧化物] 應用於 [填入反應或性質：如特定生質物分子轉化 / 表面吸附與活化]。請不要只給我正面的鼓勵，請扮演嚴格的催化與表面化學審稿人，針對以下三點進行評估：
+
+1. 這個設計與現有文獻相比，是否只屬於微幅改良（Incremental）？若要提升到『機制上的突破（Mechanistic breakthrough）』，我們應該聚焦解決哪一個核心科學問題（例如：釐清電子轉移路徑、穩定特定反應中間體、或是了解活性—選擇性與觸媒之間的化學關連？)
+2. 在配位化學或表面化學層面，這個系統可能面臨哪些合成難度、結構重構（Reconstruction）或失活風險？
+3. 若要直接證明上述的機制突破，最關鍵的決定性實驗證據（Smoking-gun evidence）會是什麼？</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ==================== CHAPTER 3 ==================== -->
+                <article id="stage-panel-3" class="stage-panel hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-sky-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-sky-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 03</span>
+                            <span>•</span>
+                            <span>Experimental Design & Spectroscopy Selection</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">3. 實驗設計、光譜鑑定規劃與 Benchwork 準備</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            除了改溶劑或反應條件外，更要透過提示詞請 AI 回顧相關文獻，推薦最具針對性的光譜分析工具（如金屬的配位環境可以EPR或EXAFS來解析），並做好進入實驗室前的萬全準備。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center mb-3">3.1</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">合成與反應條件的精準提示詞</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">明確設定限制（Constraints）：</strong>在 Prompt 中提供目標金屬錯合物/金屬氧化物比例、配基（Ligand）或前驅物種類、溶劑極性與沸點限制、反應器系統條件（批次高壓釜或連續流溫控上限）。</li>
+                                    <li><strong class="text-slate-900">控制變數與化學計量驗算：</strong>設計第一批 Screening 實驗矩陣；若請 AI 試算莫耳比例與稱重克數，<strong>必須自己用 Excel 驗算過一次</strong>才能進實驗室配藥。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80 md:col-span-2">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">3.2</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">結合文獻回溯之「光譜與表面鑑定工具」推薦</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed mb-3">
+                                    當材料在合成、表面接枝或催化反應後發生結構與電子狀態改變——例如：<strong>Cu和CeO2在高溫活化後在CeO2表面進行重組取代，形成二價的Cu位點</strong>——不要盲目送測常規儀器！應先下提示詞請 AI 回顧類似體系的文獻，推薦最具決定性的光譜技術：
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                                    <div class="bg-white p-3.5 rounded-lg border border-sky-200">
+                                        <span class="font-bold text-sky-800 block"><i class="fa-solid fa-wave-square mr-1.5"></i>EPR (電子順磁共振)</span>
+                                        偵測順磁性金屬中心（如 Cu<sup>2+</sup>, Ti<sup>3+</sup>, Fe<sup>3+</sup>, Co<sup>2+</sup>）配位對稱性改變、g-tensor 偏移、超精細耦合（Hyperfine splitting）與表面氧空缺（O<sub>v</sub>）。
+                                    </div>
+                                    <div class="bg-white p-3.5 rounded-lg border border-sky-200">
+                                        <span class="font-bold text-teal-800 block"><i class="fa-solid fa-chart-area mr-1.5"></i>高解析 XPS / Auger / UV-Vis DRS</span>
+                                        分析表面金屬價態轉移、載體與錯合物間的電子轉移方向、d-d 躍遷吸收帶位移與配位場分裂變化。
+                                    </div>
+                                    <div class="bg-white p-3.5 rounded-lg border border-sky-200">
+                                        <span class="font-bold text-indigo-800 block"><i class="fa-solid fa-satellite-dish mr-1.5"></i>原位紅外光譜 (In-situ DRIFTS / Probe IR)</span>
+                                        利用探針分子（如 CO, Pyridine, NH<sub>3</sub>）或反應物吸附，即時追蹤表面配位構型與中間體消長。
+                                    </div>
+                                    <div class="bg-white p-3.5 rounded-lg border border-sky-200">
+                                        <span class="font-bold text-amber-800 block"><i class="fa-solid fa-radiation mr-1.5"></i>XANES / EXAFS 與固態 NMR</span>
+                                        精確解析第一配位層（First coordination shell）之配位數（CN）、鍵長改變與有機配基接枝後的化學位移。
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 3A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-mono text-xs font-bold border border-sky-500/30">Prompt 3A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">文獻回溯與光譜分析工具推薦</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-3a')" class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-3a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我目前正在進行 [填入實驗，例如：將某過渡金屬錯鹽固定化於金屬氧化物載體表面 。我推測在吸附或反應過程中，金屬中心的配位環境（Coordination environment）可能發生改變，或在鹼性條件下，可能變成金屬氫氧化物沉積在載體上，或是與表面的OH官能基進行配體取代反應。
+請幫我執行以下任務：
+1. 文獻回溯與案例對照：請搜尋並回顧過去處理類似『表面固定化金屬錯合物』或『該金屬錯鹽在不同pH環境下的穩定性與可能反應』的文獻（請務必提供真實文獻與 DOI），了解該錯合物的化學後，再思考看看和表面的可能作用形式。
+2. 光譜分析工具推薦：除了常規的 XRD 與 FT-IR 之外，請針對『配位對稱性改變、不成對電子狀態、局部配位鍵長或表面電子轉移』，推薦 3–4 種適合嘗試的光譜或表面分析技術（例如：何時該使用 EPR 電子順磁共振觀察順磁中心與 g 值偏移？何時需要搭配 UV-Vis DRS、Raman 或 XAS？）。
+3. 預期光譜特徵與實驗注意細節：針對你推薦的工具（如 EPR），請說明我在實驗準備時需要注意什麼（例如：是否需要低溫液態氮/液態氦環境以捕捉訊號？樣品是否需隔絕空氣？），以及預期會觀察到什麼樣的訊號變化（如超精細耦合 Hyperfine splitting 或 g-tensor 變化）來佐證我的假說？</pre>
+                        </div>
+
+                        <!-- Prompt 3B Box (Synthesis & Control Matrix) -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 font-mono text-xs font-bold border border-sky-500/30">Prompt 3B</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">合成條件與第一批 Screening 控制實驗矩陣設計</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-3b')" class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-3b" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我準備在實驗室進行 [填入目標材料合成或催化反應測試，例如：將金屬錯合物接枝於金屬氧化物載體 / 進行生質物催化轉化]。
+目前實驗室具備的條件與限制如下：
+- 可用前驅物與配基：[填入藥品名稱與分子量]
+- 可用溶劑與設備限制：[填入溶劑種類、反應釜耐壓上限、管狀爐溫控與氣體種類]
+- 目標負載量或莫耳比例：[填入例如 2 wt% 金屬負載量，或金屬:配基 = 1:2]
+
+請協助我規劃：
+1. **化學計量與配方試算表**：以單次製備 [填入克數，如 1.0 g] 樣品為基準，列出各前驅物所需稱取的精確毫克數（mg）、毫莫耳數（mmol）與建議溶劑體積（mL）。
+2. **第一批 Screening 實驗矩陣（4–6 組實驗）**：為了快速釐清最關鍵的控制變數（例如：溶劑極性、反應溫度、金屬負載量），請幫我設計包含「空白控制組（Blank / Bare support）」在內的實驗對照表。
+3. **Benchwork 關鍵觀察指標**：在合成或反應過程中，我應該特別在實驗記錄本記下哪些現象（如溶液顏色變化、沉澱生成速率、pH 變化或壓力波動）？</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ==================== CHAPTER 4 ==================== -->
+                <article id="stage-panel-4" class="stage-panel hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-indigo-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 04</span>
+                            <span>•</span>
+                            <span>Data Analysis, Serendipity & Iteration</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">4. 從數據中找到新發現：異常診斷、文獻回溯與新實驗條件</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            當實驗數據或光譜特徵與預期不符時，往往是新發現的起點。學會把具體物理化學現象轉化為高價值提示詞，請 AI 推演假說、搜尋額外文獻，並找出潛在的新實驗條件。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center mb-3">4.1</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">將實驗觀察轉化為高價值 Prompt</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">描述具體現象而非直接下結論：</strong>不要只問 AI「為什麼沒活性？」，而是藉由鑑定數據找到可能原因。</li>
+                                    <li><strong class="text-indigo-800 bg-indigo-100/80 px-1 rounded">關鍵描述範例：</strong>XPS 雙峰分裂（Doublet splitting）與振起伴峰（Satellite peak）強度變化、結合能（Binding Energy）向高或低能區偏移 0.4 eV、EPR 新出現的各向異性訊號、DRIFTS 吸附峰消長、或副產物選擇性異常攀升。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-purple-600 text-white font-bold flex items-center justify-center mb-3">4.2</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">從異常數據中挖掘新發現 (Serendipity)</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">多元物理化學假說推演：</strong>引導 AI 針對異常現象提出 <strong>3–5 個可被實驗驗證的獨立假說（Hypotheses）</strong>（例如：配基部分脫落暴露出新的配位不飽和位點 CUS、載體表面氧空缺誘導電荷重分配、或溶劑分子參與了競爭吸附）。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">4.3</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">二次精準文獻搜尋與新實驗條件設計</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">反推檢索關鍵字：</strong>根據 AI 提出的物理化學機制假說，反推過去沒想到的專業檢索詞，回頭搜尋特定表面化學或動力學文獻。</li>
+                                    <li><strong class="text-slate-900">找出潛在新實驗條件：</strong>設計下一輪決定性的控制實驗（Control experiments），調整前處理氣氛、反應溫度窗口或添加抑制劑/探針分子，驗證假說並優化活性。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 4A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300 font-mono text-xs font-bold border border-indigo-500/30">Prompt 4A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">光譜與催化異常數據診斷、二次文獻搜尋與新實驗條件設計</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-4a')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-4a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我在進行 [填入實驗系統：如金屬錯合物/金屬氧化物催化生質物轉化或表面吸附測試] 時，觀察到以下與原先預期不同的實驗數據與光譜現象：
+- **具體實驗與光譜觀察**：[詳細描述現象，例如：反應後目標產物選擇性突然從 30% 變成以另一產物為主 / XPS 顯示金屬 2p 主峰往低結合能偏移 0.5 eV 且 Satellite 峰消失 / EPR 在 g = 2.003 處出現強訊號 / IR 某個特徵配基振動峰位移了 15 cm⁻¹]
+- **原先的預期假說**：[簡述你原本以為會發生的事]
+
+請開啟網頁搜尋功能，協助我從這些數據中挖掘潛在的新發現：
+1. **提出 3–4 個合理的物理化學機制假說**：從配位環境重構、表面電子轉移、氧空缺或酸鹼位點協同效應、以及反應中間體路徑轉變的角度，解釋為什麼會同時出現上述的光譜與催化趨勢？
+2. **搜尋額外的佐證文獻（需附真實 DOI）**：請根據上述假說，幫我搜尋是否有其他文獻在不同材料或反應中也觀察過類似的「光譜偏移或路徑轉換現象」？並提供 5 組我可以用來進 Web of Science 深挖的進階英文關鍵字組合。
+3. **找出潛在的新實驗條件與驗證實驗（Control and supplementary experiments）**：為了確認哪一個假說才是真相，並將這個意外發現轉化為研究亮點，請建議我接下來可以嘗試哪 2–3 個新的實驗條件（例如：改變前處理還原/鍛燒氣氛、更換非配位性溶劑、或特定溫度梯度的光譜追蹤）或使用額外的材料鑑定工具(如XAS或Chemisorption)？</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ==================== CHAPTER 5 ==================== -->
+                <article id="stage-panel-5" class="stage-panel hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-emerald-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 05</span>
+                            <span>•</span>
+                            <span>Academic Writing & Data Visualization</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">5. 學術寫作與數據視覺化建議</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            將零散的光譜與活性數據組裝成具說服力的科學故事（Storyboarding）。先確立圖表邏輯鏈，再進行精準、客觀的學術寫作。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center mb-3">5.1</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">數據視覺化與圖表設計邏輯</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">多維度數據呈現：</strong>向 AI 描述手邊的數據維度，請它建議最佳圖表形式（如：轉化率 vs. 選擇性雙軸圖、Arrhenius 活化能作圖、光譜堆疊與垂直虛線引導線標註）。</li>
+                                    <li><strong class="text-slate-900">學術配色與易讀性：</strong>採用 Colorblind-safe（色盲友善）學術配色（如 Viridis, Okabe-Ito 色票），確保同一組樣品在整篇論文所有圖表中的顏色與圖例符號完全一致。</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-teal-600 text-white font-bold flex items-center justify-center mb-3">5.2</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">以「圖表 (Figures)」為核心的論文架構</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">典型化學論文邏輯鏈：</strong>
+                                        <br>Fig. 1 合成策略與基本結構鑑定 (XRD/TEM/BET)
+                                        <br>Fig. 2 配位環境與表面電子結構精細光譜 (XPS/EPR/IR)
+                                        <br>Fig. 3 催化反應活性、選擇性與穩定性測試
+                                        <br>Fig. 4 原位光譜追蹤、動力學與控制實驗
+                                        <br>Fig. 5 表面反應機制示意圖 (Proposed Mechanism)
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
+                                <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">5.3</div>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">區分 Results 與 Discussion 的寫作層次</h4>
+                                <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+                                    <li><strong class="text-slate-900">Results（客觀描述）：</strong>精準描述圖表中看得到的數據與光譜變化（峰位數值、強度增減、轉化率高低），不摻雜主觀臆測。</li>
+                                    <li><strong class="text-slate-900">Discussion（深度推論）：</strong>將多張圖表的證據串聯起來（例如：把 Fig. 2 的 EPR 訊號變化與 Fig. 3 的選擇性提升做因果連結），並與文獻數據對照。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 5A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">Prompt 5A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">數據視覺化組圖建議與 Results & Discussion 段落架構生成</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-5a')" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-5a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我目前已完成了以下實驗與光譜數據收集，準備開始撰寫論文的 Results and Discussion 章節：
+- **核心研究結論**：[用一兩句話說明本篇研究最重要的發現]
+- **手邊擁有的數據清單**：
+  1. 結構與形貌數據：[如 XRD, N2 吸脫附 BET, SEM/TEM]
+  2. 光譜與表面鑑定數據：[如 XPS, EPR, FT-IR / DRIFTS, UV-Vis DRS 等]
+  3. 催化活性或吸附測試數據：[如不同溫度/溶劑下的轉化率、產物選擇性分佈、循環穩定性測試]
+
+請協助我完成以下規劃：
+1. **最佳組圖與視覺化設計（Figure Storyboarding）**：請建議我如何將上述數據分配成 4–5 張核心主圖（Main Figures，例如每張圖包含 a, b, c, d 子圖），哪些次要數據適合放入 Supporting Information？針對每一張子圖，請具體建議最佳的圖表類型（如堆疊光譜圖需標註哪些特徵輔助線、活性圖該用長條圖還是雙軸折線圖）與配色對比建議。
+2. **段落邏輯大綱（Paragraph-by-Paragraph Outline）**：請為每一個小節撰寫段落大綱，明確標示每一段的第一句主題句（Topic Sentence），並說明如何將「光譜表徵結果（如配位環境或表面缺陷變化）」自然地串聯到「催化活性與反應機制解釋」上，避免變成單純看圖說故事的流水帳。</pre>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ==================== CHAPTER 6 ==================== -->
+                <article id="stage-panel-6" class="stage-panel hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 text-white p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center gap-2 text-amber-400 text-xs font-mono uppercase tracking-widest mb-2">
+                            <span>Chapter 06</span>
+                            <span>•</span>
+                            <span>Master's Thesis & Draft Self-Review (Adapted from King & Worthington, 2026)</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-black">6. 碩士論文與初稿自我健檢 (Thesis & Manuscript Self-Review)</h3>
+                        <p class="text-slate-300 text-sm sm:text-base mt-2">
+                            在把碩士論文初稿（或各章節草稿）交給指導教授修改、或是準備學位口試（Oral Defense）之前，先讓 AI 扮演「預審口試委員」，幫你抓出邏輯漏洞與圖表瑕疵，大幅減少退件修改時間。
+                        </p>
+                    </div>
+
+                    <div class="p-6 sm:p-8 space-y-8">
+                        <!-- 3 Core Principles adapted from King & Worthington 2026 -->
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-award text-amber-600"></i> 6.1 碩士論文 AI 自我審查三大原則（改編自哈佛 King & Worthington, 2026 預審架構）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                <div class="bg-amber-50/70 rounded-xl p-5 border border-amber-200">
+                                    <div class="flex items-center gap-2.5 font-bold text-amber-950 mb-2">
+                                        <span class="w-7 h-7 rounded-lg bg-amber-500 text-white text-xs flex items-center justify-center font-mono">01</span>
+                                        <span>改善現有成果，不要求重做實驗</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 leading-relaxed">
+                                        AI 預審的唯一目標是幫你把<strong>「目前已經做出來的實驗與光譜數據」</strong>解釋得更完整、邏輯更順暢，而不是要求你進實驗室重頭做一個全新的題目。
+                                    </p>
+                                </div>
+
+                                <div class="bg-amber-50/70 rounded-xl p-5 border border-amber-200">
+                                    <div class="flex items-center gap-2.5 font-bold text-amber-950 mb-2">
+                                        <span class="w-7 h-7 rounded-lg bg-amber-500 text-white text-xs flex items-center justify-center font-mono">02</span>
+                                        <span>抓大放小，優先處理關鍵問題</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 leading-relaxed">
+                                        請 AI 直接挑出<strong>最影響論文說服力的 2–3 個主要問題</strong>（例如：光譜解讀與結論矛盾、缺少關鍵文獻對照、過度推論 Overclaiming），並提供具體的改寫建議。
+                                    </p>
+                                </div>
+
+                                <div class="bg-amber-50/70 rounded-xl p-5 border border-amber-200">
+                                    <div class="flex items-center gap-2.5 font-bold text-amber-950 mb-2">
+                                        <span class="w-7 h-7 rounded-lg bg-amber-500 text-white text-xs flex items-center justify-center font-mono">03</span>
+                                        <span>真實文獻查證，防範口試被問倒</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 leading-relaxed">
+                                        強制要求 AI 開啟<strong>聯網搜尋（Web Search）</strong>檢查是否有遺漏的重要相關文獻，且推薦的每一篇文獻必須附上真實 DOI 或網址，嚴禁憑記憶捏造假文獻。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prompt 6A Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30">Prompt 6A</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">碩士論文／初稿綜合健檢提示詞 (Master's Thesis Pre-Review Prompt)</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-6a')" class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <div class="px-5 py-2.5 bg-slate-800/40 border-b border-slate-800 text-xs text-amber-300 flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>使用時機：寫完論文的一個章節（如 Results & Discussion）或整份初稿後，上傳 PDF 至開啟聯網功能的 Gemini / Claude 並貼上此指令。</span>
+                            </div>
+                            <pre id="prompt-6a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">你現在是一位化學與材料領域的『碩士論文指導顧問與預審口試委員』。我即將把這份論文初稿交給指導教授審閱，你的唯一任務是提供具體、有建設性的回饋，幫助我把這份初稿修改得更完善。
+
+請在閱讀完整份手稿後，開啟網頁搜尋功能（Web Search），並按照以下原則為我進行審查：
+1. **聚焦現有研究範圍**：請專注於如何更好地呈現、解釋與串聯我『目前已經擁有的實驗數據與光譜結果』，請勿建議我重新設計或執行全新的大型實驗。
+2. **抓出最關鍵的 2–3 個核心問題**：請檢查我的實驗方法描述、光譜數據解讀（如 XPS、EPR、XRD、IR 等）以及催化/材料性質推論，挑出 2 到 3 個最需要優先修正的邏輯漏洞或過度推論（Overclaiming）之處，並告訴我具體該如何改寫或補充說明。
+3. **檢查遺漏文獻（必須聯網查證）**：請搜尋是否有與我的材料系統或反應機制高度相關、但我漏掉沒引用的重要文獻。**注意：你推薦的每一篇文獻都必須透過搜尋確認真實存在，並附上 DOI 或網址，嚴禁憑記憶捏造文獻。**
+
+請用清晰的 Markdown 格式輸出以下五個區塊：
+- **研究摘要 (Summary)**：用幾句話總結你讀到的研究問題、實驗方法與核心發現（讓我確認我的寫作有沒有讓你讀懂）。
+- **優點與亮點 (Strengths)**：這份初稿目前做得最好、最有說服力的部分。
+- **優先修改建議 (Key Improvements)**：2–3 個最關鍵的問題，說明為什麼這會被教授或口試委員挑剔，以及我該如何修改內文或重新詮釋數據。
+- **細節與圖表修正 (Specific & Figure Comments)**：針對各段落的文字清晰度、化學符號格式、以及圖表（Figures/Tables）排版與標註的具體改良建議。
+- **建議補充文獻 (Verified Literature)**：1–3 篇能幫我的數據提供強力支撐的真實文獻（附上 DOI 與一句話說明引用原因）。</pre>
+                        </div>
+
+                        <!-- Prompt 6B Box -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30">Prompt 6B</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">交稿前 5 點快速自我檢核提示詞 (Quick Self-Checklist Prompt)</span>
+                                </div>
+                                <button onclick="copyPrompt('prompt-6b')" class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <pre id="prompt-6b" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">請幫我針對上傳的論文初稿進行以下 5 點快速健檢：
+1. **論證合理性**：我提出的反應機制或表面化學解釋，是否與我的實驗數據吻合？有沒有哪裡解釋得太牽強？
+2. **實驗限制說明**：我是否有誠實提及實驗中的限制或誤差來源（避免口試時被委員指出『連這個問題都沒注意到』）？
+3. **故事連貫性**：從研究動機（Introduction）到實驗結果（Results）的連接是否順暢？研究主題的定位夠不夠清楚？
+4. **圖表清晰度**：我的光譜圖、反應活性圖與數據表格，是否能讓讀者一眼看出重點？圖軸標籤、圖例或呈現方式有沒有需要改進的地方？
+5. **寫作與格式**：內文的語氣、專業術語與化學式標註是否準確且容易閱讀？</pre>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: Master Prompt Library (Filterable & Searchable) -->
+        <section id="prompt-library" class="scroll-mt-20 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-700 bg-cyan-100 px-3 py-1 rounded-full">Master Prompt Library</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">化學研究全階段 Prompt 提示詞總庫</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-1">支援關鍵字即時搜尋與階段分類過濾，點擊右上角按鈕即可一鍵複製提示詞模板。</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="prompt-search-input" oninput="filterPrompts()" placeholder="搜尋 EPR、配位、機制、論文健檢..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+                </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div class="flex flex-wrap gap-2" id="prompt-filter-pills">
+                <button onclick="setPromptCategory('all')" data-cat="all" class="prompt-cat-btn bg-slate-900 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                    全部提示詞 (7)
+                </button>
+                <button onclick="setPromptCategory('ch1')" data-cat="ch1" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    1. 文獻綜整
+                </button>
+                <button onclick="setPromptCategory('ch2')" data-cat="ch2" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    2. 機制突破發想
+                </button>
+                <button onclick="setPromptCategory('ch3')" data-cat="ch3" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    3. 實驗與光譜規劃 (EPR)
+                </button>
+                <button onclick="setPromptCategory('ch4')" data-cat="ch4" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    4. 異常數據診斷
+                </button>
+                <button onclick="setPromptCategory('ch5')" data-cat="ch5" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    5. 視覺化與寫作
+                </button>
+                <button onclick="setPromptCategory('ch6')" data-cat="ch6" class="prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition">
+                    6. 碩士論文自我健檢
+                </button>
+            </div>
+
+            <!-- Prompt Cards Grid -->
+            <div id="master-prompts-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Populated dynamically via JS from the canonical prompts to avoid duplication -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: Student Prompt Sharing Hub (同學 Prompt 實戰分享專區) -->
+        <section id="student-share-section" class="scroll-mt-20 space-y-6 pb-8">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <!-- Section Banner -->
+                <div class="bg-gradient-to-r from-slate-900 via-teal-950 to-cyan-950 text-white p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-mono mb-2">
+                            <i class="fa-solid fa-users-rays"></i> Lab Community Prompt Hub
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black">同學 Prompt 實戰分享專區</h2>
+                        <p class="text-slate-300 text-sm sm:text-base mt-1">
+                            在研究過程中摸索出好用的提示詞嗎？歡迎在此新增分享！新增後的提示詞會保存在你的瀏覽器中，並可一鍵複製為 Markdown 格式貼至實驗室群組或 GitHub 共用。
+                        </p>
+                    </div>
+                    <button onclick="exportAllSharedPrompts()" class="self-start md:self-center shrink-0 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-semibold shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-export"></i> 匯出全部私藏/分享為 Markdown
+                    </button>
+                </div>
+
+                <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Left Column: Submission Form (5 cols) -->
+                    <div class="lg:col-span-5 bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 space-y-4 self-start">
+                        <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-teal-600"></i> 新增我的實戰 Prompt
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">分享者姓名 / 暱稱 <span class="text-rose-500">*</span></label>
+                            <input type="text" id="share-author" placeholder="例如：碩一 王小明 / Ming" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">所屬研究階段 <span class="text-rose-500">*</span></label>
+                            <select id="share-category" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                <option value="ch1">第 1 章：文獻搜尋與知識庫</option>
+                                <option value="ch2">第 2 章：發想方向與機制突破</option>
+                                <option value="ch3">第 3 章：實驗設計與光譜規劃</option>
+                                <option value="ch4">第 4 章：數據解析與異常診斷</option>
+                                <option value="ch5">第 5 章：寫作與數據視覺化</option>
+                                <option value="ch6">第 6 章：碩士論文自我健檢</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Prompt 標題 <span class="text-rose-500">*</span></label>
+                            <input type="text" id="share-title" placeholder="例如：原位 DRIFTS 碳酸鹽物種峰位歸屬對照" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">適用工具與情境說明（選填）</label>
+                            <input type="text" id="share-hint" placeholder="例如：搭配 NotebookLM 分析紅外光譜文獻時使用" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Prompt 完整內容 <span class="text-rose-500">*</span></label>
+                            <textarea id="share-content" rows="5" placeholder="請貼上你設計的提示詞內容（建議將可替換的參數用 [中括號] 標示，方便其他同學套用）..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        </div>
+
+                        <div id="share-form-msg" class="hidden text-xs font-semibold px-3 py-2 rounded-lg"></div>
+
+                        <button onclick="addStudentPrompt()" class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> 發佈至分享牆並同步加入總庫
+                        </button>
+                    </div>
+
+                    <!-- Right Column: Shared Prompts Display Wall (7 cols) -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-star text-amber-500"></i> 實驗室同學分享牆
+                                <span id="student-prompt-count" class="text-xs font-mono bg-teal-100 text-teal-800 px-2.5 py-0.5 rounded-full">0 則分享</span>
+                            </h3>
+                            <span class="text-xs text-slate-500">點擊「複製 Markdown」可快速傳至實驗室群組</span>
+                        </div>
+
+                        <div id="student-prompts-wall" class="space-y-4">
+                            <!-- Dynamically populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript for Interactive Tabs, Copy to Clipboard, and Prompt Library -->
+    <script>
+        // Canonical Prompt Metadata for Master Library Rendering
+        const promptLibraryData = [
+            {
+                id: 'prompt-1a',
+                code: 'Prompt 1A',
+                category: 'ch1',
+                stageLabel: '第 1 章：文獻與知識庫',
+                badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+                btnClass: 'bg-cyan-600 hover:bg-cyan-500',
+                title: '跨文獻系統性表格綜整與爭議點分析',
+                toolHint: '適用於 Google NotebookLM / Gemini'
+            },
+            {
+                id: 'prompt-2a',
+                code: 'Prompt 2A',
+                category: 'ch2',
+                stageLabel: '第 2 章：發想與機制突破',
+                badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+                btnClass: 'bg-teal-600 hover:bg-teal-500',
+                title: '聚焦「機制突破」的研究點子壓力測試',
+                toolHint: '適用於 Gemini Pro / Claude (扮演嚴格審稿人)'
+            },
+            {
+                id: 'prompt-3a',
+                code: 'Prompt 3A',
+                category: 'ch3',
+                stageLabel: '第 3 章：實驗與光譜規劃',
+                badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+                btnClass: 'bg-sky-600 hover:bg-sky-500',
+                title: '文獻回溯與光譜分析工具推薦（配位環境改變 / EPR 分析）',
+                toolHint: '適用於 Deep Research / 開啟聯網搜尋之 AI'
+            },
+            {
+                id: 'prompt-3b',
+                code: 'Prompt 3B',
+                category: 'ch3',
+                stageLabel: '第 3 章：實驗與光譜規劃',
+                badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+                btnClass: 'bg-sky-600 hover:bg-sky-500',
+                title: '合成條件與第一批 Screening 控制實驗矩陣設計',
+                toolHint: '試算後務必使用 Excel 二次驗算'
+            },
+            {
+                id: 'prompt-4a',
+                code: 'Prompt 4A',
+                category: 'ch4',
+                stageLabel: '第 4 章：異常數據診斷',
+                badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+                btnClass: 'bg-indigo-600 hover:bg-indigo-500',
+                title: '光譜與催化異常數據診斷、二次文獻搜尋與新實驗條件設計',
+                toolHint: '從異常光譜偏移挖掘新發現與新實驗條件'
+            },
+            {
+                id: 'prompt-5a',
+                code: 'Prompt 5A',
+                category: 'ch5',
+                stageLabel: '第 5 章：寫作與數據視覺化',
+                badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                btnClass: 'bg-emerald-600 hover:bg-emerald-500',
+                title: '數據視覺化組圖建議與 Results & Discussion 段落架構生成',
+                toolHint: '建立 Figure 邏輯鏈與段落 Topic Sentences'
+            },
+            {
+                id: 'prompt-6a',
+                code: 'Prompt 6A',
+                category: 'ch6',
+                stageLabel: '第 6 章：碩士論文自我健檢',
+                badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                btnClass: 'bg-amber-600 hover:bg-amber-500',
+                title: '碩士論文／初稿綜合健檢提示詞 (Master\'s Thesis Pre-Review)',
+                toolHint: '改編自 King & Worthington (2026) 預審架構'
+            },
+            {
+                id: 'prompt-6b',
+                code: 'Prompt 6B',
+                category: 'ch6',
+                stageLabel: '第 6 章：碩士論文自我健檢',
+                badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                btnClass: 'bg-amber-600 hover:bg-amber-500',
+                title: '交稿前 5 點快速自我檢核提示詞 (Quick Self-Checklist)',
+                toolHint: '快速檢查論證合理性、實驗限制與圖表清晰度'
+            }
+        ];
+
+        // Default Example Student Shared Prompt & LocalStorage Loader
+        const STORAGE_KEY_STUDENT_PROMPTS = 'chem_lab_student_prompts_v1';
+        const stageNameMap = {
+            ch1: '第 1 章：文獻與知識庫',
+            ch2: '第 2 章：發想與機制突破',
+            ch3: '第 3 章：實驗與光譜規劃',
+            ch4: '第 4 章：異常數據診斷',
+            ch5: '第 5 章：寫作與數據視覺化',
+            ch6: '第 6 章：碩士論文自我健檢'
+        };
+
+        let studentSharedPrompts = [];
+
+        function loadStudentPrompts() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_STUDENT_PROMPTS);
+                if (raw) {
+                    studentSharedPrompts = JSON.parse(raw);
+                } else {
+                    // Seed with 1 helpful example so students see how it works
+                    studentSharedPrompts = [
+                        {
+                            id: 'student-seed-1',
+                            author: '實驗室學長姐範例',
+                            category: 'ch4',
+                            stageLabel: '第 4 章：異常數據診斷',
+                            title: 'In-situ DRIFTS 表面吸附物種峰位歸屬與反應途徑判讀',
+                            toolHint: '適用於 NotebookLM（先匯入 5–10 篇原位紅外線文獻後提問）',
+                            content: '我在進行 [填入催化劑名稱] 的原位漫反射紅外光譜（In-situ DRIFTS）測試時，在通入 [填入反應氣體，如 CO2 + H2] 並升溫至 [填入溫度，如 250 °C] 後，於波數 [填入波數，如 1580, 1365, 1430 cm⁻¹] 處觀察到明顯的吸收峰消長。\n\n請根據知識庫中的文獻幫我整理：\n1. 這些波數分別對應哪些表面吸附物種（如 bidentate formate, monodentate carbonate, 或甲氧基 methoxy）的對稱/非對稱伸縮振動（ν_as / ν_s）？\n2. 文獻中如何利用這些峰隨時間或溫度的變化趨勢，區分誰是真正的「反應中間體（Active intermediate）」，誰只是「旁觀物種（Spectator species）」？',
+                            createdAt: '範例分享'
+                        }
+                    ];
+                }
+            } catch (e) {
+                studentSharedPrompts = [];
+            }
+        }
+
+        function saveStudentPrompts() {
+            try {
+                localStorage.setItem(STORAGE_KEY_STUDENT_PROMPTS, JSON.stringify(studentSharedPrompts));
+            } catch (e) {
+                console.error('儲存失敗:', e);
+            }
+        }
+
+        let currentPromptCategory = 'all';
+        let allStagesExpanded = false;
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Switch between the 6 Research Stages
+        function selectStage(stageNum) {
+            if (allStagesExpanded) {
+                allStagesExpanded = false;
+                document.getElementById('expand-btn-text').textContent = '展開全部 6 章節同頁瀏覽';
+            }
+
+            for (let i = 1; i <= 6; i++) {
+                const panel = document.getElementById(`stage-panel-${i}`);
+                const tabBtn = document.getElementById(`tab-btn-${i}`);
+                if (i === stageNum) {
+                    panel.classList.remove('hidden');
+                    tabBtn.classList.add('active');
+                } else {
+                    panel.classList.add('hidden');
+                    tabBtn.classList.remove('active');
+                }
+            }
+        }
+
+        // Jump from the Top Icon-Style Overview to the selected stage
+        function jumpToStage(stageNum) {
+            selectStage(stageNum);
+            const workflowEl = document.getElementById('workflow-section');
+            if (workflowEl) {
+                workflowEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Toggle Expand All Stages vs Single Tab View
+        function toggleAllStagesView() {
+            allStagesExpanded = !allStagesExpanded;
+            const btnText = document.getElementById('expand-btn-text');
+            const panels = document.querySelectorAll('.stage-panel');
+            const tabs = document.querySelectorAll('.stage-tab');
+
+            if (allStagesExpanded) {
+                panels.forEach(p => p.classList.remove('hidden'));
+                tabs.forEach(t => t.classList.add('active'));
+                btnText.textContent = '切換回單一章節分頁模式';
+            } else {
+                selectStage(1);
+                btnText.textContent = '展開全部 6 章節同頁瀏覽';
+            }
+        }
+
+        // Copy Prompt to Clipboard with Fallback & Toast
+        function copyPrompt(elementId) {
+            const preElement = document.getElementById(elementId);
+            if (!preElement) return;
+            copyRawText(preElement.innerText);
+        }
+
+        function copyRawText(textToCopy, customMsg) {
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showCopyToast(customMsg);
+            } catch (err) {
+                console.error('無法複製文字:', err);
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        let toastTimeout;
+        function showCopyToast(customMsg) {
+            const toast = document.getElementById('toast');
+            const titleEl = toast.querySelector('p.text-sm.font-bold');
+            if (titleEl) {
+                titleEl.textContent = customMsg || '已複製提示詞 (Prompt Copied!)';
+            }
+            clearTimeout(toastTimeout);
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2600);
+        }
+
+        // Render Master Prompt Library Cards (Combining Official + Student Shared Prompts)
+        function renderMasterPromptLibrary() {
+            const grid = document.getElementById('master-prompts-grid');
+            const searchQuery = (document.getElementById('prompt-search-input').value || '').toLowerCase().trim();
+            grid.innerHTML = '';
+
+            let visibleCount = 0;
+
+            const combinedPrompts = [
+                ...promptLibraryData.map(item => {
+                    const sourcePre = document.getElementById(item.id);
+                    return {
+                        ...item,
+                        promptText: sourcePre ? sourcePre.innerText : '',
+                        isStudent: false
+                    };
+                }),
+                ...studentSharedPrompts.map((sp, idx) => ({
+                    id: sp.id,
+                    code: `同學分享 #${idx + 1}`,
+                    category: sp.category,
+                    stageLabel: `${sp.stageLabel} · by ${sp.author}`,
+                    badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+                    btnClass: 'bg-teal-600 hover:bg-teal-500',
+                    title: sp.title,
+                    toolHint: sp.toolHint || '實驗室同學實戰分享',
+                    promptText: sp.content,
+                    isStudent: true
+                }))
+            ];
+
+            // Update total count label on the 'all' button
+            const allBtn = document.querySelector('[data-cat="all"]');
+            if (allBtn) allBtn.textContent = `全部提示詞 (${combinedPrompts.length})`;
+
+            combinedPrompts.forEach(item => {
+                const promptText = item.promptText || '';
+
+                const matchesCategory = (currentPromptCategory === 'all') || (item.category === currentPromptCategory);
+                const matchesSearch = !searchQuery ||
+                    item.title.toLowerCase().includes(searchQuery) ||
+                    item.stageLabel.toLowerCase().includes(searchQuery) ||
+                    promptText.toLowerCase().includes(searchQuery);
+
+                if (matchesCategory && matchesSearch) {
+                    visibleCount++;
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col justify-between shadow-sm';
+                    const hiddenPreId = `lib-pre-${item.id}`;
+                    card.innerHTML = `
+                        <div>
+                            <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded font-mono text-xs font-bold border ${item.badgeClass}">${escapeHtml(item.code)}</span>
+                                    <span class="text-xs text-slate-400 font-medium">${escapeHtml(item.stageLabel)}</span>
+                                </div>
+                                <button onclick="copyPrompt('${hiddenPreId}')" class="px-3 py-1.5 rounded-lg ${item.btnClass} text-white text-xs font-semibold transition flex items-center gap-1.5 shadow">
+                                    <i class="fa-regular fa-copy"></i> 複製提示詞
+                                </button>
+                            </div>
+                            <div class="px-5 pt-4 pb-2 border-b border-slate-800/80">
+                                <h4 class="text-white font-bold text-base">${escapeHtml(item.title)}</h4>
+                                <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-cyan-400"></i>${escapeHtml(item.toolHint)}</p>
+                            </div>
+                            <pre id="${hiddenPreId}" class="prompt-pre p-5 text-slate-200 font-mono text-xs leading-relaxed max-h-72 overflow-y-auto">${escapeHtml(promptText)}</pre>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+
+            if (visibleCount === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center text-slate-500">
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300 mb-3"></i>
+                        <p class="font-bold text-slate-700">找不到符合條件的提示詞</p>
+                        <p class="text-xs mt-1">請嘗試清除搜尋關鍵字或切換回「全部提示詞」分類</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render Student Shared Prompts Wall
+        function renderStudentSharingWall() {
+            const wall = document.getElementById('student-prompts-wall');
+            const countBadge = document.getElementById('student-prompt-count');
+            if (!wall) return;
+
+            countBadge.textContent = `${studentSharedPrompts.length} 則分享`;
+            wall.innerHTML = '';
+
+            if (studentSharedPrompts.length === 0) {
+                wall.innerHTML = `
+                    <div class="bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-8 text-center text-slate-500">
+                        <i class="fa-regular fa-comment-dots text-2xl text-slate-400 mb-2"></i>
+                        <p class="font-bold text-slate-700 text-sm">目前還沒有同學分享提示詞</p>
+                        <p class="text-xs mt-1">成為第一位在左側填寫並分享實戰 Prompt 的同學吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            studentSharedPrompts.forEach((item) => {
+                const preId = `wall-pre-${item.id}`;
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900 rounded-xl border border-slate-700 overflow-hidden shadow-sm';
+                card.innerHTML = `
+                    <div class="bg-slate-800/95 px-4 py-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 font-mono text-xs font-bold">
+                                <i class="fa-solid fa-user-graduate mr-1"></i>${escapeHtml(item.author)}
+                            </span>
+                            <span class="text-xs text-slate-300 bg-slate-700/80 px-2 py-0.5 rounded">${escapeHtml(item.stageLabel)}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="copyPrompt('${preId}')" class="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold transition flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> 複製 Prompt
+                            </button>
+                            <button onclick="copySingleShareMarkdown('${item.id}')" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium transition flex items-center gap-1" title="複製成 Markdown 格式分享到群組">
+                                <i class="fa-brands fa-markdown"></i> 複製 Markdown
+                            </button>
+                            <button onclick="deleteStudentPrompt('${item.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition" title="刪除此則分享">
+                                <i class="fa-regular fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="px-4 pt-3 pb-2 border-b border-slate-800">
+                        <h4 class="text-white font-bold text-sm sm:text-base">${escapeHtml(item.title)}</h4>
+                        ${item.toolHint ? `<p class="text-xs text-cyan-400 mt-0.5"><i class="fa-solid fa-circle-info mr-1"></i>${escapeHtml(item.toolHint)}</p>` : ''}
+                    </div>
+                    <pre id="${preId}" class="prompt-pre p-4 text-slate-200 font-mono text-xs leading-relaxed max-h-56 overflow-y-auto">${escapeHtml(item.content)}</pre>
+                `;
+                wall.appendChild(card);
+            });
+        }
+
+        function showShareFormMessage(text, isError) {
+            const msgBox = document.getElementById('share-form-msg');
+            msgBox.classList.remove('hidden', 'bg-rose-100', 'text-rose-800', 'bg-teal-100', 'text-teal-800');
+            if (isError) {
+                msgBox.classList.add('bg-rose-100', 'text-rose-800');
+            } else {
+                msgBox.classList.add('bg-teal-100', 'text-teal-800');
+            }
+            msgBox.textContent = text;
+            setTimeout(() => msgBox.classList.add('hidden'), 3500);
+        }
+
+        function addStudentPrompt() {
+            const author = document.getElementById('share-author').value.trim();
+            const category = document.getElementById('share-category').value;
+            const title = document.getElementById('share-title').value.trim();
+            const toolHint = document.getElementById('share-hint').value.trim();
+            const content = document.getElementById('share-content').value.trim();
+
+            if (!author || !title || !content) {
+                showShareFormMessage('請填寫「分享者姓名」、「Prompt 標題」與「Prompt 完整內容」！', true);
+                return;
+            }
+
+            const newEntry = {
+                id: 'student-' + Date.now(),
+                author,
+                category,
+                stageLabel: stageNameMap[category] || '實戰分享',
+                title,
+                toolHint: toolHint || '實驗室同學實戰分享',
+                content,
+                createdAt: new Date().toLocaleDateString('zh-TW')
+            };
+
+            studentSharedPrompts.unshift(newEntry);
+            saveStudentPrompts();
+            renderStudentSharingWall();
+            renderMasterPromptLibrary();
+
+            // Clear inputs
+            document.getElementById('share-title').value = '';
+            document.getElementById('share-hint').value = '';
+            document.getElementById('share-content').value = '';
+            showShareFormMessage('已成功新增至分享牆，並同步加入上方「Prompt 提示詞總庫」！', false);
+        }
+
+        function deleteStudentPrompt(id) {
+            studentSharedPrompts = studentSharedPrompts.filter(item => item.id !== id);
+            saveStudentPrompts();
+            renderStudentSharingWall();
+            renderMasterPromptLibrary();
+        }
+
+        function copySingleShareMarkdown(id) {
+            const item = studentSharedPrompts.find(p => p.id === id);
+            if (!item) return;
+            const md = `### 【${item.stageLabel}】${item.title}\n- **分享者**：${item.author}\n- **適用情境**：${item.toolHint}\n\n\`\`\`text\n${item.content}\n\`\`\``;
+            copyRawText(md, '已複製 Markdown！可直接貼至群組或 GitHub');
+        }
+
+        function exportAllSharedPrompts() {
+            if (studentSharedPrompts.length === 0) {
+                showCopyToast('目前尚無分享內容可匯出');
+                return;
+            }
+            const mdList = studentSharedPrompts.map((item, i) =>
+                `### ${i + 1}. 【${item.stageLabel}】${item.title}\n- **分享者**：${item.author}\n- **適用情境**：${item.toolHint}\n\n\`\`\`text\n${item.content}\n\`\`\``
+            ).join('\n\n---\n\n');
+            copyRawText(mdList, '已匯出全部同學分享為 Markdown！');
+        }
+
+        function setPromptCategory(cat) {
+            currentPromptCategory = cat;
+            const buttons = document.querySelectorAll('.prompt-cat-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'prompt-cat-btn bg-slate-900 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition';
+                } else {
+                    btn.className = 'prompt-cat-btn bg-white text-slate-700 border border-slate-200 hover:border-cyan-500 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition';
+                }
+            });
+            renderMasterPromptLibrary();
+        }
+
+        function filterPrompts() {
+            renderMasterPromptLibrary();
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        // Initialize on window load
+        window.onload = function() {
+            loadStudentPrompts();
+            renderStudentSharingWall();
+            renderMasterPromptLibrary();
+        };
+    </script>
+</body>
+</html>
