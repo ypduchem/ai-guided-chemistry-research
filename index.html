@@ -683,10 +683,10 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-slate-50 rounded-xl p-5 border border-slate-200/80">
                                 <div class="w-9 h-9 rounded-lg bg-cyan-600 text-white font-bold flex items-center justify-center mb-3">1.1</div>
-                                <h4 class="font-bold text-slate-900 text-lg mb-2">傳統檢索與 Deep Research 深度探索</h4>
+                                <h4 class="font-bold text-slate-900 text-lg mb-2">使用AI工具協助整理文獻</h4>
                                 <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
-                                    <li><strong class="text-slate-900">核心資料庫設定：</strong>精準組合關鍵字於 SciFinder 與 Google Scholar 搜尋。</li>
-                                    <li><strong class="text-cyan-800 bg-cyan-100/80 px-1 rounded">善用 AI Deep Research 工具：</strong>切入陌生課題（如二氧化碳或生物質衍生平台分子轉化路徑、材料介面的化學、表面修飾、）時，先用具備 <strong>Deep Research</strong> 功能的 AI 進行廣度與深度兼具的領域掃描，生成包含真實文獻來源的調查報告，藉此抓出核心關鍵字與代表性研究團隊。</li>
+                                    <li><strong class="text-slate-900">了解網頁版搜尋與Agent搜尋的不同：</strong>若使用網頁版LLM，AI無法取得內文，若使用Local agent（如Google Antigravity，它可以使用你的電腦取得學校的區域網路獲得全文，取得更多資訊直接摘要）。</li>
+                                    <li><strong class="text-cyan-800 bg-cyan-100/80 px-1 rounded">選擇工具和下提示詞（prompts）</strong>了解你想要的資訊，目的務必清楚，指令明確以免搜尋範圍過大（如：Cu/CeO2系統進行RWGS反應的DRIFTS研究探討，不要有任何其他金屬），使用網頁版或Agent幫你找出所有相關文獻，之後自己去下載PDF檔</li>
                                     
                              </ul>
                             </div>
@@ -695,7 +695,7 @@
                                 <div class="w-9 h-9 rounded-lg bg-teal-600 text-white font-bold flex items-center justify-center mb-3">1.2</div>
                                 <h4 class="font-bold text-slate-900 text-lg mb-2">建立專屬知識庫（整合 NotebookLM / Gemini）</h4>
                                 <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
-                                    <li><strong class="text-slate-900">精選高品質文獻源：</strong>從 Deep Research 與傳統資料庫中，挑選 <strong>10–20 篇高關聯度核心文獻（2–3 篇高引用數之 Review + 近期代表性研究論文）</strong>匯入 Google NotebookLM，確保知識來源基於真實 PDF，減少AI記憶幻覺。</li>
+                                    <li><strong class="text-slate-900">精選高品質文獻源：</strong>找出全部相關文獻後，挑選 <strong>10–20 篇高關聯度核心文獻（2–3 篇高引用數之 Review + 近期代表性研究論文）</strong>匯入 Google NotebookLM，確保知識來源基於真實 PDF，減少AI記憶幻覺。</li>
                                     <li><strong class="text-teal-800 bg-teal-100/80 px-1 rounded">跨文獻綜整技巧：</strong>利用提示詞請 AI 自動建立跨文獻比較表格（例如：不同文獻之配位環境/配基設計、金屬氧化物表面修飾方式、反應溫度/壓力、轉化率與選擇性對照表）。</li>
                                 </ul>
                             </div>
@@ -705,7 +705,7 @@
                                 <h4 class="font-bold text-slate-900 text-lg mb-2">抓出領域共識與爭議點</h4>
                                 <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
                                     <li><strong class="text-slate-900">表面機制與構效關係：</strong>利用 NotebookLM 快速摘要出目前學界對特定表面化學機制、結構—活性關係（Structure–Activity Relationship, SAR）的主流解釋。</li>
-                                    <li><strong class="text-slate-900">鎖定未解爭議：</strong>找出不同研究團隊對「真正活性位點（Active sites）」或「關鍵中間體」以及「活性點合成設計」的看法分歧處，這往往就是我們切入新研究的最佳突破口。</li>
+                                    <li><strong class="text-slate-900">鎖定未解爭議：</strong>自己想一想，不同研究團隊對「真正活性位點（Active sites）」或「關鍵中間體」以及「活性點合成設計」是否有可以切入研究的地方。你也可以回到AI聊天串詢問你想出的研究問題是否已被研究過，注意我們實驗室希望做的是"化學研究"（化學研究詳述如下）而非"工程研究"(如：加某某金屬增加觸媒活性)，</li>
                                 </ul>
                             </div>
                         </div>
@@ -713,24 +713,24 @@
                         <!-- Lab Scenario Examples -->
                         <div class="bg-cyan-50/60 border border-cyan-200 rounded-xl p-5">
                             <h4 class="text-sm font-bold uppercase tracking-wider text-cyan-900 mb-3 flex items-center gap-2">
-                                <i class="fa-solid fa-vials text-cyan-600"></i> 本實驗室四大課題檢索與整理範例
+                                <i class="fa-solid fa-vials text-cyan-600"></i> 實驗室研究的四個面向跟對應的化學問題
                             </h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs sm:text-sm">
                                 <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
                                     <span class="font-bold text-cyan-800 block mb-1">配位化合物與表面作用</span>
-                                    整理金屬中心種類、配基的穩定性、接枝於載體前後的配位數變化與穩定性。
+                                    金屬配位化合物如何藉由配體交換或接枝法(grafting)和金屬氧化物形成強作用力，反應後的配位變化，穩定性與對催化的影響為何？
                                 </div>
                                 <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
-                                    <span class="font-bold text-teal-800 block mb-1">金屬氧化物表面化學</span>
-                                    對比不同晶面暴露（Facet engineering）、表面氧空缺濃度（O<sub>v</sub>）如何影響雙元金屬氧化物(binary metal oxide)或與表面缺陷作用的可能性。
+                                    <span class="font-bold text-teal-800 block mb-1">材料化學與合成設計</span>
+                                    如何用合理的化學方法設計出具有催化活性的金屬-金屬氧化物介面？這些介面的化學性質為何？
                                 </div>
                                 <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
                                     <span class="font-bold text-emerald-800 block mb-1">生質物轉化 (Biomass)</span>
-                                    彙整單糖異構化、Retro-aldol condensation斷鍵與加氫三種途徑形成的可能產物，了解觸媒系統對轉化率與目標產物選擇性的影響。
+                                    單糖異構化、Retro-aldol condensation斷鍵與加氫三種途徑形成的可能產物，了解觸媒系統對反應動力學與目標產物選擇性的影響。
                                 </div>
                                 <div class="bg-white p-3.5 rounded-lg border border-cyan-100">
-                                    <span class="font-bold text-sky-800 block mb-1">CO<sub>2</sub> 與小分子活化</span>
-                                    比較金屬—載體強交互作用（SMSI）、表面吸附態中間體（Formate vs. Carboxylate 路徑）與反應溫度。
+                                    <span class="font-bold text-sky-800 block mb-1">CO<sub>2</sub> 的催化機制與動力學研究</span>
+                                    金屬—金屬氧化物介面如何影響表面吸附態中間體（Formate vs. carbonate 路徑）與反應機構研究。
                                 </div>
                             </div>
                         </div>
@@ -740,7 +740,7 @@
                             <div class="bg-slate-800/90 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
                                 <div class="flex items-center gap-2.5">
                                     <span class="px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30">Prompt 1A</span>
-                                    <span class="text-white font-bold text-sm sm:text-base">跨文獻系統性表格綜整與爭議點分析（適用於 NotebookLM / Gemini）</span>
+                                    <span class="text-white font-bold text-sm sm:text-base">跨文獻系統性表格綜整與爭議點分析（以建立好文獻資料庫的 NotebookLM使用為例）</span>
                                 </div>
                                 <button onclick="copyPrompt('prompt-1a')" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow">
                                     <i class="fa-regular fa-copy"></i> 複製提示詞
@@ -749,7 +749,7 @@
                             <pre id="prompt-1a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">請根據我上傳於知識庫中的所有文獻，針對「[填入研究主題：如特定配位化合物固載於金屬氧化物表面 / 生物質衍生糖選擇性轉化/金屬-金屬氧化物活性位點」進行跨文獻系統性綜整，並執行以下三項任務：
 
 1. **建立跨文獻結構與活性比較表（Markdown Table）**：
-   請為每一篇文獻整理出以下欄位（若文獻未提及請標註 N/A，切勿自行推測）：
+   請為每一篇文獻整理出以下欄位（若文獻未提及請標註 N/A，切勿自行推測，若是Reivew中提及的內容，試著也幫我找到原始出處）：
    - 文獻作者與發表年份
    - 核心材料系統（如:金屬種類、配基結構 Ligand、或金屬氧化物載體與晶面/缺陷特性）
    - 合成或表面修飾方法（如含浸法、水熱法、表面接枝等）
