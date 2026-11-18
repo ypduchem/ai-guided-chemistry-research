@@ -705,7 +705,7 @@
                                 <h4 class="font-bold text-slate-900 text-lg mb-2">抓出領域共識與爭議點</h4>
                                 <ul class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
                                     <li><strong class="text-slate-900">表面機制與構效關係：</strong>利用 NotebookLM 快速摘要出目前學界對特定表面化學機制、結構—活性關係（Structure–Activity Relationship, SAR）的主流解釋。</li>
-                                    <li><strong class="text-slate-900">鎖定未解爭議：</strong>自己想一想，不同研究團隊對「真正活性位點（Active sites）」或「關鍵中間體」以及「活性點合成設計」是否有可以切入研究的地方。你也可以回到AI聊天串詢問你想出的研究問題是否已被研究過，注意我們實驗室希望做的是"化學研究"（化學研究詳述如下）而非"工程研究"(如：加某某金屬增加觸媒活性)，</li>
+                                    <li><strong class="text-slate-900">鎖定未解爭議：</strong>自己想一想，不同研究團隊對「真正活性位點（Active sites）」或「關鍵中間體」以及「活性點合成設計」是否有可以切入研究的地方。你也可以回到AI聊天串詢問你想出的研究問題是否已被研究過，注意我們實驗室希望做的是"化學研究"（化學研究詳述如下）而非"化學工程研究"(如：加A金屬可增加觸媒活性，但加B不行)。</li>
                                 </ul>
                             </div>
                         </div>
@@ -816,10 +816,10 @@
                                     <i class="fa-regular fa-copy"></i> 複製提示詞
                                 </button>
                             </div>
-                            <pre id="prompt-2a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我目前計畫研究 [填入材料系統：如某特定配位化合物 / 表面修飾之金屬氧化物] 應用於 [填入反應或性質：如特定生質物分子轉化 / 表面吸附與活化]。請不要只給我正面的鼓勵，請扮演嚴格的催化與表面化學審稿人，針對以下三點進行評估：
+                            <pre id="prompt-2a" class="prompt-pre p-5 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed">我目前計畫研究 [填入材料系統：如某特定配位化合物 / 表面修飾之金屬氧化物] 應用於 [填入反應或性質：如特定生質物分子轉化 / 表面吸附與活化]。請不要只給我正面的鼓勵，請扮演該領域嚴格的審稿人，針對以下三點進行評估：
 
-1. 這個設計與現有文獻相比，是否只屬於微幅改良（Incremental）？若要提升到『機制上的突破（Mechanistic breakthrough）』，我們應該聚焦解決哪一個核心科學問題（例如：釐清電子轉移路徑、穩定特定反應中間體、或是了解活性—選擇性與觸媒之間的化學關連？)
-2. 在配位化學或表面化學層面，這個系統可能面臨哪些合成難度、結構重構（Reconstruction）或失活風險？
+1. 這個研究問題與設計是否已經有相關文獻已回答或報導？若想取得『機制上的突破（Mechanistic breakthrough）或化學洞見(chemical insight)』，我們應該聚焦解決哪一個核心科學問題（例如：釐清電子轉移路徑、穩定特定反應中間體、或是了解活性—選擇性與觸媒之間的化學關連？)
+2. 在配位化學或表面化學層面，這個系統可能面臨哪些合成難度、結構重構（Reconstruction）？
 3. 若要直接證明上述的機制突破，最關鍵的決定性實驗證據（Smoking-gun evidence）會是什麼？</pre>
                         </div>
                     </div>
@@ -892,7 +892,7 @@
 請幫我執行以下任務：
 1. 文獻回溯與案例對照：請搜尋並回顧過去處理類似『表面固定化金屬錯合物』或『該金屬錯鹽在不同pH環境下的穩定性與可能反應』的文獻（請務必提供真實文獻與 DOI），了解該錯合物的化學後，再思考看看和表面的可能作用形式。
 2. 光譜分析工具推薦：除了常規的 XRD 與 FT-IR 之外，請針對『配位對稱性改變、不成對電子狀態、局部配位鍵長或表面電子轉移』，推薦 3–4 種適合嘗試的光譜或表面分析技術（例如：何時該使用 EPR 電子順磁共振觀察順磁中心與 g 值偏移？何時需要搭配 UV-Vis DRS、Raman 或 XAS？）。
-3. 預期光譜特徵與實驗注意細節：針對你推薦的工具（如 EPR），請說明我在實驗準備時需要注意什麼（例如：是否需要低溫液態氮/液態氦環境以捕捉訊號？樣品是否需隔絕空氣？），以及預期會觀察到什麼樣的訊號變化（如超精細耦合 Hyperfine splitting 或 g-tensor 變化）來佐證我的假說？</pre>
+3. 預期光譜特徵與實驗注意細節：針對你推薦的工具（如 EPR），請說明我在實驗準備時需要注意什麼（例如：是否需要低溫液態氮/液態氦環境以捕捉訊號？要用什麼作為標準品進行比較？），以及預期會觀察到什麼樣的訊號變化（如超精細耦合 Hyperfine splitting 或 g-tensor 變化）來佐證我的假說？</pre>
                         </div>
 
                         <!-- Prompt 3B Box (Synthesis & Control Matrix) -->
@@ -978,7 +978,7 @@
 - **具體實驗與光譜觀察**：[詳細描述現象，例如：反應後目標產物選擇性突然從 30% 變成以另一產物為主 / XPS 顯示金屬 2p 主峰往低結合能偏移 0.5 eV 且 Satellite 峰消失 / EPR 在 g = 2.003 處出現強訊號 / IR 某個特徵配基振動峰位移了 15 cm⁻¹]
 - **原先的預期假說**：[簡述你原本以為會發生的事]
 
-請開啟網頁搜尋功能，協助我從這些數據中挖掘潛在的新發現：
+請開啟網頁搜尋功能（適用claude agent或google antigravity），協助我從這些數據中挖掘潛在的新發現：
 1. **提出 3–4 個合理的物理化學機制假說**：從配位環境重構、表面電子轉移、氧空缺或酸鹼位點協同效應、以及反應中間體路徑轉變的角度，解釋為什麼會同時出現上述的光譜與催化趨勢？
 2. **搜尋額外的佐證文獻（需附真實 DOI）**：請根據上述假說，幫我搜尋是否有其他文獻在不同材料或反應中也觀察過類似的「光譜偏移或路徑轉換現象」？並提供 5 組我可以用來進 Web of Science 深挖的進階英文關鍵字組合。
 3. **找出潛在的新實驗條件與驗證實驗（Control and supplementary experiments）**：為了確認哪一個假說才是真相，並將這個意外發現轉化為研究亮點，請建議我接下來可以嘗試哪 2–3 個新的實驗條件（例如：改變前處理還原/鍛燒氣氛、更換非配位性溶劑、或特定溫度梯度的光譜追蹤）或使用額外的材料鑑定工具(如XAS或Chemisorption)？</pre>
@@ -1214,7 +1214,7 @@
             </div>
         </section>
 
-        <!-- SECTION 4: Student Prompt Sharing Hub (同學 Prompt 實戰分享專區) -->
+        <!-- SECTION 4: Student Prompt Sharing Hub (Prompt 分享區) -->
         <section id="student-share-section" class="scroll-mt-20 space-y-6 pb-8">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <!-- Section Banner -->
@@ -1225,7 +1225,7 @@
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-black">同學 Prompt 實戰分享專區</h2>
                         <p class="text-slate-300 text-sm sm:text-base mt-1">
-                            在研究過程中摸索出好用的提示詞嗎？歡迎在此新增分享！新增後的提示詞會保存在你的瀏覽器中，並可一鍵複製為 Markdown 格式貼至實驗室群組或 GitHub 共用。
+                            在研究過程中摸索出好用的提示詞嗎？歡迎在此新增分享！新增後的提示詞會保存在你的瀏覽器中，並可一鍵複製為 Markdown 格式。
                         </p>
                     </div>
                     <button onclick="exportAllSharedPrompts()" class="self-start md:self-center shrink-0 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-semibold shadow-lg transition flex items-center gap-2">
@@ -1237,7 +1237,7 @@
                     <!-- Left Column: Submission Form (5 cols) -->
                     <div class="lg:col-span-5 bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200/90 space-y-4 self-start">
                         <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-plus-circle text-teal-600"></i> 新增我的實戰 Prompt
+                            <i class="fa-solid fa-plus-circle text-teal-600"></i> 新增我的 Prompt
                         </h3>
 
                         <div>
@@ -1330,7 +1330,7 @@
                 stageLabel: '第 3 章：實驗與光譜規劃',
                 badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
                 btnClass: 'bg-sky-600 hover:bg-sky-500',
-                title: '文獻回溯與光譜分析工具推薦（配位環境改變 / EPR 分析）',
+                title: '文獻回溯與光譜分析工具推薦（以用EPR 分析配位環境為例）',
                 toolHint: '適用於 Deep Research / 開啟聯網搜尋之 AI'
             },
             {
